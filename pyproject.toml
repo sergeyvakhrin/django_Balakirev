@@ -9,6 +9,7 @@ readme = "README.md"
 python = "^3.12"
 psycopg2 = "^2.9.10"
 ipython = "^8.29.0"
+pytils = "^0.4.1"
 
 
 [build-system]

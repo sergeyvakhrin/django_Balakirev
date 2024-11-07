@@ -27,7 +27,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1']
 
-INTERNAL_IPS = ['127.0.0.1']
+INTERNAL_IPS = ['127.0.0.1'] # для вывода панели отладки debug_toolbar
 
 
 # Application definition
@@ -40,9 +40,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     
-    'django_extensions',
+    'django_extensions', # для использования shell_plus --print-sql
     'women.apps.WomenConfig',
-    'debug_toolbar',
+    'debug_toolbar', # для вывода панели отладки debug_toolbar
 
 ]
 
@@ -55,7 +55,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware', # для вывода панели отладки debug_toolbar
 ]
 
 ROOT_URLCONF = 'sitewomen.urls'
