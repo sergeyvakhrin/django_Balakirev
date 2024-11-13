@@ -2,6 +2,7 @@ from django.urls import reverse
 from django.db import models
 # from django.template.defaultfilters import slugify
 from pytils.translit import slugify # для корректного создания слаг
+from django.core.validators import MinLengthValidator, MaxLengthValidator
 
 
 class Category(models.Model):
@@ -21,7 +22,10 @@ class Category(models.Model):
 
 class Women(models.Model):
     title = models.CharField(max_length=255, verbose_name='Заголовок')
-    slug = models.SlugField(max_length=255, unique=True, db_index=True)
+    slug = models.SlugField(max_length=255, unique=True, db_index=True, validators=[
+                               MinLengthValidator(5, message="Минимум 5 символов"),
+                               MaxLengthValidator(100, message="Максимум 100 символов")
+                           ])
     content = models.TextField(blank=True, verbose_name='Статья')
     time_create = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
     time_update = models.DateTimeField(auto_now=True)
