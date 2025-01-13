@@ -3,9 +3,14 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.template.loader import render_to_string
 from django.template.defaultfilters import slugify
+import uuid # уникальные строчки
 
-from women.forms import AddPostForm
-from women.models import Women, Category, TagPost
+
+from women.forms import AddPostForm, UploadFileForm
+from women.models import Women, Category, TagPost, UploadFiles
+
+from django.core.mail import send_mail
+
 
 menu = [{'title': "О сайте", 'url_name': 'about'},
         {'title': "Добавить статью", 'url_name': 'add_page'},
@@ -50,9 +55,22 @@ def show_category(request, cat_slug):
     }
     return render(request, 'women/index.html', data)
 
+# def handle_upload_file(f):
+#     """ Функция для загрузки файлов на сервер """
+#     with open(f"uploads/{uuid.uuid4()}_{f.name}", "wb+") as destination:
+#         for chunk in f.chunks():
+#             destination.write(chunk)
 
 def about(request):
-    return render(request, 'women/about.html', {'title': 'О сайте', 'menu': menu})
+    if request.method == "POST":
+        form = UploadFileForm(request.POST, request.FILES)
+        if form.is_valid():
+            # handle_upload_file(form.cleaned_data['file'])
+            fp = UploadFiles(file=form.cleaned_data['file'])
+            fp.save()
+    else:
+        form = UploadFileForm()
+    return render(request, 'women/about.html', {'title': 'О сайте', 'menu': menu, 'form': form})
 
 
 def show_post(request, post_slug):
@@ -69,14 +87,15 @@ def show_post(request, post_slug):
 
 def addpage(request):
     if request.method == "POST":
-        form = AddPostForm(request.POST)
+        form = AddPostForm(request.POST, request.FILES)
+        # try:
+        #     Women.objects.create(**form.cleaned_data) # создаем новую запись в базе распаковывая форму
+        #     return redirect('home')
+        # except:
+        #     form.add_error(None, "Ошибка добавления записи")
         if form.is_valid():
-            # print(form.cleaned_data)
-            try:
-                Women.objects.create(**form.cleaned_data) # создаем новую запись в базе распаковывая форму
-                return redirect('home')
-            except:
-                form.add_error(None, "Ошибка добавления записи")
+            form.save()
+        return redirect('home')
     else:
         form = AddPostForm()
 

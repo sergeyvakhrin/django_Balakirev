@@ -2,7 +2,7 @@
 
 {% block content %}
 <h1> {{ title }} </h1>
-<form action="" method="POST">
+<form action="" method="POST" enctype="multipart/form-data">
     {% csrf_token %}
    <!-- <p><label for="id_1">Текст: </label><input type='text' id="id_1" name="filed_text"></p>
     <p><label for="id_2">Отметка: </label><input type='checkbox' id="id_2" name="filed_checkbox"></p>   форма на уровне html

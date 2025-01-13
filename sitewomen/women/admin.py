@@ -1,6 +1,7 @@
 from django.contrib import admin, messages
+from django.utils.safestring import mark_safe
 
-from women.models import Women, Category
+from women.models import Women, Category, UploadFiles
 
 
 class MarriedFilter(admin.SimpleListFilter):
@@ -25,9 +26,9 @@ class MarriedFilter(admin.SimpleListFilter):
 
 @admin.register(Women)
 class WomenAdmin(admin.ModelAdmin):
-    fields = ['title', 'content', 'slug', 'cat', 'husband', 'tags'] # для ограничения выводимых полей карточки
+    fields = ['title', 'content', 'photo', 'post_photo', 'slug', 'cat', 'husband', 'tags'] # для ограничения выводимых полей карточки
     # exclude = ['tag', 'is_published'] # исключает поля для вывода
-    readonly_fields = ['slug'] # для отображения, но запрета редактирования
+    readonly_fields = ['slug', 'post_photo'] # для отображения, но запрета редактирования
 
     # prepopulated_fields = {'slug': ('title', )} # второй способ автоматического формирования slug
     # без изменения save(). Работает только если поле slug редактируемое.
@@ -36,7 +37,7 @@ class WomenAdmin(admin.ModelAdmin):
     filter_horizontal = ['tags'] # более удобное отображение множественного выбора
     # filter_vertical = ['tags'] # более удобное отображение множественного выбора
 
-    list_display = ('title', 'time_create', 'is_published', 'cat', 'brief_info') # вывод в таблицу
+    list_display = ('title', 'post_photo', 'time_create', 'is_published', 'cat') # вывод в таблицу
     list_display_links = ('title', 'time_create', ) # сделать кликабельным
     ordering = ['-time_create', 'title', ] # добавить сортировку
     list_editable = ['is_published'] # добавить возможность редактирования
@@ -44,11 +45,19 @@ class WomenAdmin(admin.ModelAdmin):
     actions = ['set_published', 'set_draft'] # дополнительные действия с записями
     search_fields = ['title', 'cat__name'] # добавляем поиск по записям
     list_filter = [MarriedFilter, 'cat__name', 'is_published'] # добавляем фильтрацию кастомную и встроенную
+    save_on_top = True # Для отображения кнопки сохранить и сверху и снизу
 
-    @admin.display(description='Краткое описание', ordering='content')
-    def brief_info(self, women: Women):
-        """ Вывод дополнительного поля """
-        return f'Описание {len(women.content)} символов.'
+    # @admin.display(description='Краткое описание', ordering='content')
+    # def brief_info(self, women: Women):
+    #     """ Вывод дополнительного поля """
+    #     return f'Описание {len(women.content)} символов.'
+
+    @admin.display(description='Изображение', ordering='content')
+    def post_photo(self, women: Women):
+        """ Отображение фото в админке """
+        if women.photo:
+            return mark_safe(f"<img src='{women.photo.url}' width=50>")
+        return "Без фото"
 
     @admin.action(description='Сделать опубликованными')
     def set_published(self, request, queryset):
